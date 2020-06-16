@@ -27,6 +27,7 @@ int main()
     int                serverport;         // porta (formato host)
     struct sockaddr_in mysocketaddr;
     struct sockaddr_in fromaddr;
+    struct sockaddr_in socket_a;
     struct hostent   * hostentryp;         // host entry (p/ traducao nome<->ip)
     struct servent   * serventryp;         // host entry (p/ traducao nome<->ip)
 
@@ -75,13 +76,13 @@ int main()
             perror("ERRO no recebimento de datagramas UDP \n");
             exit(1); 
         }
-        // printf("Endereco de origem: %s\n",inet_ntop(AF_INET,&fromaddr,buffer,BUFFERSIZE));
+        printf("Endereco de origem: %s\n",inet_ntop(AF_INET,&fromaddr.sin_addr,buffer,BUFFERSIZE));
+        printf("Porta de origem = %hu \n",ntohs(fromaddr.sin_port));
         printf("<< %s\n",msg);
         fflush(stdout);
         
         // Divide mensagem em comando e conteudo
-        strncpy(command_str, msg, 4);
-        command_str[5] = "\0";
+        strncpy(command_str, msg, 4);        command_str[5] = "\0";
         printf("comando: %s\n",command_str);
 
         // Compara comandos
@@ -90,17 +91,17 @@ int main()
             // TODO: armazenar usuario
             // Envia OKOK caso haja espaco
             // TODO: fazer condicao em que nao haja espaco
-            status = sendto(sd,"OKOK\0",strlen("OKOK\0"),0,(struct sockaddr *) &fromaddr,sizeof(fromaddr));
+            status = sendto(sd,"OKOK:\0",strlen("OKOK:\0"),0,(struct sockaddr *) &fromaddr,sizeof(fromaddr));
             if (status < 0)
             {
-                printf("ERRO no envio de OKOK \n");
+                printf("ERRO no envio\n");
                 exit(1); 
             }
         }
 
         else if (strcmp("TEST",command_str) == 0){
             // Envia OKOK
-            status = sendto(sd,"OKOK\0",strlen("OKOK\0"),0,(struct sockaddr *) &fromaddr,sizeof(fromaddr));
+            status = sendto(sd,"OKOK:\0",strlen("OKOK:\0"),0,(struct sockaddr *) &fromaddr,sizeof(fromaddr));
             if (status < 0)
             {
                 printf("ERRO no envio de OKOK \n");

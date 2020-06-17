@@ -40,7 +40,7 @@ int Send_OKOK(struct sockaddr_in f_addr)
     {
     int    status;
 
-    status = sendto(sd,"OKOK:\0",strlen("OKOK:\0"),0,(struct sockaddr *) &f_addr,sizeof(f_addr));
+    status = sendto(sd,"OKOK:\0",strlen("OKOK:\0")+1,0,(struct sockaddr *) &f_addr,sizeof(f_addr));
     if (status < 0)
         {
         perror("Erro na chamada send() na função Send_OKOK");
@@ -52,7 +52,7 @@ int Send_TEST(struct sockaddr_in f_addr)
     {
     int    status;
 
-    status = sendto(sd,"TEST:\0",strlen("TEST:\0"),0,(struct sockaddr *) &f_addr,sizeof(f_addr));
+    status = sendto(sd,"TEST:\0",strlen("TEST:\0")+1,0,(struct sockaddr *) &f_addr,sizeof(f_addr));
     if (status < 0)
         {
         perror("Erro na chamada send() na função Send_TEST");
@@ -65,7 +65,7 @@ int Send_BUSY(struct sockaddr_in f_addr)
     {
     int    status;
 
-    status = sendto(sd,"BUSY:\0",strlen("BUSY:\0"),0,(struct sockaddr *) &f_addr,sizeof(f_addr));
+    status = sendto(sd,"BUSY:\0",strlen("BUSY:\0")+1,0,(struct sockaddr *) &f_addr,sizeof(f_addr));
     if (status < 0)
         {
         perror("Erro na chamada send() na função Send_BUSY");
@@ -73,6 +73,57 @@ int Send_BUSY(struct sockaddr_in f_addr)
         }
     return 0;
     }
+
+int Send_BYE(struct sockaddr_in f_addr)
+    {
+    int    status;
+
+    status = sendto(sd,"BYE :\0",strlen("BYE  :\0"),0,(struct sockaddr *) &f_addr,sizeof(f_addr));
+    if (status < 0)
+        {
+        perror("Erro na chamada send() na função Send_BYE");
+        return(-1);
+        }
+    return 0;
+    }
+int Send_DOWN(char* msg, char* user_name)
+{
+    int    status;
+    char msg_to_send[95];
+    struct sockaddr_in f_addr;
+
+    printf("Enviando mensagem para usuarios\n");
+    fflush(stdout);
+    strcpy(msg_to_send, "DOWN:");
+    strcat(msg_to_send, user_name);
+    strcat(msg_to_send, ":");
+    strcat(msg_to_send, msg);
+    // strcat(msg_to_send, "\0");
+
+    for (int i = 0; i < tabela_usuarios.n_usuarios; i++)
+    {   
+        // Compara usuario que enviou a mensagem com a tabela
+        if(strcmp(user_name,tabela_usuarios.t[i].nome) != 0)
+        {
+            // Obtem endereco da tabela
+            f_addr=tabela_usuarios.t[i].ender_socket;
+
+            status = sendto(sd,msg_to_send,strlen(msg_to_send)+1,0,(struct sockaddr *) &f_addr,sizeof(f_addr));
+            if (status < 0)
+                {
+                perror("Erro na chamada send() na função Send_DOWN");
+                return(-1);
+                }
+            
+        }
+        
+    }
+    printf("Mensagem enviada\n");
+    fflush(stdout);
+
+    return 0;
+    
+}
 void timer(){
 
     int    status;
@@ -80,13 +131,13 @@ void timer(){
 
     while (1){
         sleep(30);
-        printf("30s se passaram\n");       
+        // printf("30s se passaram\n");       
     }
 }
 
 int main()
 {
-   
+    char nomeUP[11];
     mysocketaddr.sin_family = AF_INET;
     mysocketaddr.sin_addr.s_addr   = INADDR_ANY;
 
@@ -156,7 +207,7 @@ int main()
 
             // Armazena usuario em uma struct
             usuario.ender_socket=fromaddr;
-            strcpy(usuario.nome,msg+5);
+            strncpy(usuario.nome,msg+5,10);
 
             status=InserirTabela(&tabela_usuarios,usuario);
             printf("numero de usuarios na tabela: %d\n",tabela_usuarios.n_usuarios );
@@ -167,7 +218,6 @@ int main()
             }
             else
             {
-                printf("Enviando BUSY\n");
                 // Envia BUSY caso não haja espaco
                 Send_BUSY(fromaddr);
             }
@@ -179,10 +229,27 @@ int main()
             // Envia OKOK
             Send_OKOK(fromaddr);
         }
-        
-        else if (strcmp("UP",command_str) == 0){
-            // Envia OKOK
-            Send_OKOK(fromaddr);
+
+        else if (strcmp("UP  ",command_str) == 0){
+
+            strncpy(nomeUP,GetNome(&tabela_usuarios, fromaddr) , 10);
+            printf("Mensagem de %s recebida:%s\n", nomeUP,msg+5);
+            Send_DOWN(msg+5,nomeUP);
+        }
+
+        else if (strcmp("EXIT",command_str) == 0){
+
+            strncpy(nomeUP,GetNome(&tabela_usuarios, fromaddr) , 10);
+            if(RetirarTabela(&tabela_usuarios,fromaddr)>0)
+            {
+                printf("Usuario %s saiu\n", nomeUP);
+                Send_DOWN("saiu\0",nomeUP);
+                Send_BYE(fromaddr);
+            }
+            else
+            {
+                printf("Exclusão de usuário %s não feita\n", nomeUP);
+            }
         }
 
         // status = sendto(sd,msg,strlen(msg)+1,0,(struct sockaddr *) &fromaddr,sizeof(fromaddr));

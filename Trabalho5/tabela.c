@@ -28,7 +28,8 @@ int TabelaCheia(struct tabela *T){
 // Retorna: 1 se bem sucedido
 //			0 se falha 
 int InserirTabela(struct tabela *T, struct nome_address n){
-	if (TabelaCheia(T)== TRUE)
+	printf("TabelaCheia=%d\n",TabelaCheia(T) );
+	if (TabelaCheia(T) == TRUE)
 		return FALSE;
 	else{
 		T->t[T->n_usuarios]=n;

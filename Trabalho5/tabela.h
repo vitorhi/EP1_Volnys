@@ -26,3 +26,5 @@ void InitTabela(struct tabela *T);
 int TabelaVazia(struct tabela *T);
 int TabelaCheia(struct tabela *T);
 int InserirTabela(struct tabela *T, struct nome_address n);
+char *GetNome(struct tabela *T, struct sockaddr_in socket);
+int RetirarTabela(struct tabela *T, struct sockaddr_in socket);

@@ -215,7 +215,7 @@ void rx()
              {
              ack_pending = 0;
              rxbuffer[MSGMAXSIZE-1] = '\0';    // adicionado por segurança
-             fprintf(terminalrx,"%s",&rxbuffer[5]);
+             fprintf(terminalrx,"%s\n",&rxbuffer[5]);
              }
          else if (strncmp("BYE :",rxbuffer,5) == 0)
              {
@@ -294,11 +294,15 @@ int main()
     char   rxbuffer[CHATMSGSIZE];       // buffer de recepcao
     char   opcao;
 
-    printf("Entre com um nome ou um endereço IP: ");
-    scanf("%s",hostnamep);
+    // printf("Entre com um nome ou um endereço IP: ");
+    // scanf("%s",hostnamep);
 
-    printf("Porta: ");
-    scanf("%d",&serverport);
+    // printf("Porta: ");
+    // scanf("%d",&serverport);
+    serversockaddr.sin_family = AF_INET;
+    serversockaddr.sin_addr.s_addr   = INADDR_ANY;
+    serverport=10000;
+    // mysocketaddr.sin_port = htons((unsigned short int) serverport);
 
     // SOCKET
     sd = socket(PF_INET, SOCK_DGRAM, 0); 
@@ -312,26 +316,26 @@ int main()
     //* Converte nome de host ou endereco IP para network byte order 
     //************************************                          
     
-    hostentryp = gethostbyname(hostnamep);
-    if (hostentryp != NULL)
-        {
-        // conseguiu converter nome em endereco IP: copia os 4 bytes do endereço IP
-        hostaddress = hostentryp->h_addr;
-        bcopy(hostaddress, (char *)&serversockaddr.sin_addr, hostentryp->h_length);
-        }
-    else
-        {
-        // Nao conseguiu converter nome para endereco IP
-        // Verifica se hostname informado é um endereço IP
+    // hostentryp = gethostbyname(hostnamep);
+    // if (hostentryp != NULL)
+    //     {
+    //     // conseguiu converter nome em endereco IP: copia os 4 bytes do endereço IP
+    //     hostaddress = hostentryp->h_addr;
+    //     bcopy(hostaddress, (char *)&serversockaddr.sin_addr, hostentryp->h_length);
+    //     }
+    // else
+    //     {
+    //     // Nao conseguiu converter nome para endereco IP
+    //     // Verifica se hostname informado é um endereço IP
     
-        status = inet_pton(AF_INET,hostnamep,&serversockaddr.sin_addr);
-        if (status <=0)
-            {
-            perror("ERRO: inet_pton()");
-            printf("Nome de host ou endereço IP inválido \n");
-            return(-1);
-            }
-        }
+    //     status = inet_pton(AF_INET,hostnamep,&serversockaddr.sin_addr);
+    //     if (status <=0)
+    //         {
+    //         perror("ERRO: inet_pton()");
+    //         printf("Nome de host ou endereço IP inválido \n");
+    //         return(-1);
+    //         }
+    //     }
         
     //********************************
     // CONNECT

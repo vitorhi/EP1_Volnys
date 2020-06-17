@@ -11,9 +11,10 @@
 struct nome_address {
 	char nome[11];
 	struct sockaddr_in ender_socket;
-	sem_t sem_mutex;
-	sem_t sem_itens;
-	sem_t sem_slots;
+	int n_teste_falhas;
+	// sem_t sem_mutex;
+	// sem_t sem_itens;
+	// sem_t sem_slots;
 } ;
 
 struct tabela{

@@ -25,6 +25,7 @@ int                status;             // estado
 int                size;
 char               buffer[BUFFERSIZE]; // buffer temporario
 char               msg[MSGMAXSIZE];    // buffer temporario
+char               test_msg[MSGMAXSIZE];    // buffer temporario
 char               command_str[5];     // comando recebido
 int                serverport;         // porta (formato host)
 struct sockaddr_in mysocketaddr;
@@ -127,10 +128,95 @@ int Send_DOWN(char* msg, char* user_name)
 void timer(){
 
     int    status;
-    char   timerbuffer[10];    // buffer para mensagem "TEST:"
+    char nomeEXIT[11];
+    // char   timerbuffer[10];    // buffer para mensagem "TEST:"
+    struct sockaddr_in f_addr;
+    f_addr.sin_family = AF_INET;
+    f_addr.sin_addr.s_addr   = INADDR_ANY;
 
     while (1){
         sleep(30);
+        // Verifica se usuarios nao responderam 
+
+        // Envia TEST a todos usuarios
+        for (int i = 0; i < tabela_usuarios.n_usuarios; i++)
+        {   
+            
+            // Obtem endereco da tabela
+            f_addr=tabela_usuarios.t[i].ender_socket;
+            // Envia Test para todos os usuarios
+            Send_TEST(f_addr);         
+            
+        }
+        for (int i = 0; i < tabela_usuarios.n_usuarios; i++)
+        {   
+            
+            // Obtem endereco da tabela
+            f_addr=tabela_usuarios.t[i].ender_socket;
+
+            size = sizeof(f_addr);
+            status=recvfrom(sd,test_msg,MSGMAXSIZE,0,(struct sockaddr *)&f_addr,&size);
+            if (status < 0)
+            {
+                // Retira usuario
+                // Copia informacoes do usuario para uso posterior
+                strcpy(nomeEXIT,tabela_usuarios.t[i].nome);
+                f_addr=tabela_usuarios.t[i].ender_socket;
+
+                printf("Usuario %s nao respondeu a TEST\n",nomeEXIT);
+                tabela_usuarios.t[i].n_teste_falhas++;
+                if(tabela_usuarios.t[i].n_teste_falhas>=2)
+                {
+                    printf("Excluindo usuario: %s\n",nomeEXIT);
+                    if(RetirarTabela(&tabela_usuarios,tabela_usuarios.t[i].ender_socket)>0)
+                    {
+                        printf("Usuario %s saiu\n", nomeEXIT);
+                        Send_DOWN("saiu\0",nomeEXIT);
+                        Send_BYE(f_addr);
+                    }
+                    else
+                    {
+                        printf("Exclusão de usuário %s falhou\n", nomeEXIT);
+                    }
+
+                }
+                // perror("ERRO no recebimento de datagramas UDP \n");
+                // exit(1); 
+            }
+            else if(strcmp("OKOK:\0",test_msg) == 0)
+            {   
+                printf("Usuario %s respondeu a TEST\n",tabela_usuarios.t[i].nome);
+                // Reseta contador de falhas
+                tabela_usuarios.t[i].n_teste_falhas=0;
+            }
+            else
+            {
+                // Retira usuario
+                // Copia informacoes do usuario para uso posterior
+                strcpy(nomeEXIT,tabela_usuarios.t[i].nome);
+                f_addr=tabela_usuarios.t[i].ender_socket;
+
+                printf("Usuario %s nao respondeu a TEST\n",nomeEXIT);
+                tabela_usuarios.t[i].n_teste_falhas++;
+                if(tabela_usuarios.t[i].n_teste_falhas>=2)
+                {
+                    printf("Excluindo usuario: %s\n",nomeEXIT);
+                    if(RetirarTabela(&tabela_usuarios,tabela_usuarios.t[i].ender_socket)>0)
+                    {
+                        printf("Usuario %s saiu\n", nomeEXIT);
+                        Send_DOWN("saiu\0",nomeEXIT);
+                        Send_BYE(f_addr);
+                    }
+                    else
+                    {
+                        printf("Exclusão de usuário %s falhou\n", nomeEXIT);
+                    }
+
+                }
+            }
+            
+        }
+
         // printf("30s se passaram\n");       
     }
 }
@@ -208,6 +294,7 @@ int main()
             // Armazena usuario em uma struct
             usuario.ender_socket=fromaddr;
             strncpy(usuario.nome,msg+5,10);
+            usuario.n_teste_falhas=0;
 
             status=InserirTabela(&tabela_usuarios,usuario);
             printf("numero de usuarios na tabela: %d\n",tabela_usuarios.n_usuarios );
@@ -248,7 +335,7 @@ int main()
             }
             else
             {
-                printf("Exclusão de usuário %s não feita\n", nomeUP);
+                printf("Exclusão de usuário %s falhou\n", nomeUP);
             }
         }
 

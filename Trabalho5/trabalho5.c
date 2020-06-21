@@ -130,9 +130,9 @@ void timer(){
     int    status;
     char nomeEXIT[11];
     // char   timerbuffer[10];    // buffer para mensagem "TEST:"
-    struct sockaddr_in f_addr;
-    f_addr.sin_family = AF_INET;
-    f_addr.sin_addr.s_addr   = INADDR_ANY;
+    struct sockaddr_in timer_addr;
+    timer_addr.sin_family = AF_INET;
+    timer_addr.sin_addr.s_addr   = INADDR_ANY;
 
     while (1){
         sleep(30);
@@ -143,25 +143,25 @@ void timer(){
         {   
             
             // Obtem endereco da tabela
-            f_addr=tabela_usuarios.t[i].ender_socket;
+            timer_addr=tabela_usuarios.t[i].ender_socket;
             // Envia Test para todos os usuarios
-            Send_TEST(f_addr);         
+            Send_TEST(timer_addr);         
             
         }
         for (int i = 0; i < tabela_usuarios.n_usuarios; i++)
         {   
             
             // Obtem endereco da tabela
-            f_addr=tabela_usuarios.t[i].ender_socket;
+            timer_addr=tabela_usuarios.t[i].ender_socket;
 
-            size = sizeof(f_addr);
-            status=recvfrom(sd,test_msg,MSGMAXSIZE,0,(struct sockaddr *)&f_addr,&size);
+            size = sizeof(timer_addr);
+            status=recvfrom(sd,test_msg,MSGMAXSIZE,0,(struct sockaddr *)&timer_addr,&size);
             if (status < 0)
             {
                 // Retira usuario
                 // Copia informacoes do usuario para uso posterior
                 strcpy(nomeEXIT,tabela_usuarios.t[i].nome);
-                f_addr=tabela_usuarios.t[i].ender_socket;
+                timer_addr=tabela_usuarios.t[i].ender_socket;
 
                 printf("Usuario %s nao respondeu a TEST\n",nomeEXIT);
                 tabela_usuarios.t[i].n_teste_falhas++;
@@ -172,7 +172,7 @@ void timer(){
                     {
                         printf("Usuario %s saiu\n", nomeEXIT);
                         Send_DOWN("saiu\0",nomeEXIT);
-                        Send_BYE(f_addr);
+                        Send_BYE(timer_addr);
                     }
                     else
                     {
@@ -194,7 +194,7 @@ void timer(){
                 // Retira usuario
                 // Copia informacoes do usuario para uso posterior
                 strcpy(nomeEXIT,tabela_usuarios.t[i].nome);
-                f_addr=tabela_usuarios.t[i].ender_socket;
+                timer_addr=tabela_usuarios.t[i].ender_socket;
 
                 printf("Usuario %s nao respondeu a TEST\n",nomeEXIT);
                 tabela_usuarios.t[i].n_teste_falhas++;
@@ -205,7 +205,7 @@ void timer(){
                     {
                         printf("Usuario %s saiu\n", nomeEXIT);
                         Send_DOWN("saiu\0",nomeEXIT);
-                        Send_BYE(f_addr);
+                        Send_BYE(timer_addr);
                     }
                     else
                     {
@@ -277,7 +277,7 @@ int main()
             perror("ERRO no recebimento de datagramas UDP \n");
             exit(1); 
         }
-        printf("Endereco de origem: %s\n",inet_ntop(AF_INET,&fromaddr.sin_addr,buffer,BUFFERSIZE));
+        printf("\n\nEndereco de origem: %s\n",inet_ntop(AF_INET,&fromaddr.sin_addr,buffer,BUFFERSIZE));
         printf("Porta de origem = %hu \n",ntohs(fromaddr.sin_port));
         printf("<< %s\n",msg);
         fflush(stdout);

@@ -17,6 +17,7 @@
 extern int errno;
 
 #define IPMAXSTRSIZE 16
+#define BUFFERSIZE 1024
 
 //###############################################################
 // openActiveTCPport
@@ -113,15 +114,18 @@ int openActiveTCPport(char *hostnamep, char *servicenamep) {
 
 int main() {
     int sd;
-    char buffer[5000];
+    char tx_buffer[5000];
+    char rx_buffer[5000];
     int status;
     int n;
 
     char hostnamep[80];
     char servicenamep[80];
 
-    printf("HOSTNAME: ");
-    scanf("%s", hostnamep);
+   
+    strcpy(hostnamep,"localhost");
+    printf("HOSTNAME: %s\n",hostnamep);
+    // scanf("%s", hostnamep);
 
     printf("SERVICENAME: ");
     scanf("%s", servicenamep);
@@ -132,25 +136,45 @@ int main() {
         exit(1);
     }
 
-    fgets(buffer, 80, stdin);  // descarta lixo
+    fgets(tx_buffer, 80, stdin);  // descarta lixo
     while (1) {
         printf(">> ");
-        fgets(buffer, 80, stdin);
-        buffer[strlen(buffer) - 1] = '\r';
-        buffer[strlen(buffer) - 1] = '\n';
-        buffer[strlen(buffer) - 1] = '\0';
+        fgets(tx_buffer, 80, stdin);
+        tx_buffer[strlen(tx_buffer) - 1] = '\r';
+        tx_buffer[strlen(tx_buffer) - 1] = '\n';
+        tx_buffer[strlen(tx_buffer) - 1] = '\0';
 
-        status = send(sd, buffer, 80, 0);
+        status = write(sd, tx_buffer, 80);
         if (status < 0) {
             printf("ERRO no envido de mensagens\n");
             exit(1);
         }
 
-        n = recv(sd, buffer, 5000, 0);
-        if (n < 0) {
-            printf("ERRO no envido de datagramas UDP \n");
-            exit(1);
-        }
-        printf(">>> %s \n", buffer);
+        do{
+            
+            // fflush(stdout);
+            rx_buffer[0] = 0;
+            n = read(sd, rx_buffer, BUFFERSIZE+1);
+            if (n < 0) {
+                printf("ERRO no envido de datagramas UDP \n");
+                exit(1);
+            }
+
+            printf(">>> %s \n", rx_buffer);
+
+            // Verifica se END está no comeco
+            if ((strncmp("END:",rx_buffer,4) == 0))
+            {
+                printf("END esta no comeco\n");
+                break;
+
+            }
+            // Verifica se END está no final
+            else if ((strncmp("END:",rx_buffer+strlen(rx_buffer)-4,4)==0))
+            {
+                printf("END esta no final\n");
+                break;
+            }
+            }while(1);
     }
 }

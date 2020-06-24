@@ -135,13 +135,10 @@ void consumidor(int id) {
     printf("Inicio Thread de tratamento %d \n", id);
 
     while(1){
-        newsd = 0;
+        //newsd = 0;
         // Pega o item da fila, mas não retira
-        while(newsd <= 0) {
-            if(F.nitens > 0) {
-                newsd = RetirarFilaSemRemover(&F);
-            }
-        }
+        newsd = RetirarFila(&F);
+ 
         //newsd = RetirarFila(&F);
         // processar item
         printf("Thread de tratamento %d consumiu conexao sd = %d\n", id, newsd);

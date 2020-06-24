@@ -159,8 +159,8 @@ void consumidor(int id) {
                             strlen("Fechando conexao\0") + 1);
                 if (status == -1) perror("Erro na chamada write");
                 printf("Fechando conexao com sd = %d\n", newsd);
-                SendEND(newsd);
-                printf("\n");
+                //SendEND(newsd);
+                //printf("\n");
                 //if (status == -1) perror("Erro na chamada close");
 
                 conectado = 0;
@@ -236,14 +236,12 @@ void consumidor(int id) {
                     status = write(newsd, rxbuffer, strlen(rxbuffer) + 1);
                     if (status == -1) perror("Erro na chamada write");
                 }
-
-                //Envia END para client saber que acabou os dados
-                SendEND(newsd);
-                printf("\n");
             }
+            //Envia END para client saber que acabou os dados
+            SendEND(newsd);
+            printf("\n");
         }
         status = close(newsd);
-        newsd = RetirarFila(&F);
         printf("Thread de tratamento %d terminado \n", id);
         printf("Aguardando novas conexoes... \n");
         conectado = 1;

@@ -26,4 +26,5 @@ int FilaVazia(struct fila *F);
 int FilaCheia(struct fila *F);
 void InserirFila(struct fila *F, int item);
 int RetirarFila(struct fila *F);
+int RetirarFilaSemRemover(struct fila *F);
 void PrintaBuffer(struct fila *F);

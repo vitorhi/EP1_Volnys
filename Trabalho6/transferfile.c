@@ -51,7 +51,7 @@ int transferfile(char *path,int output_fd)
            status = close(input_fd);
            return(-1);
            }
-      write(output_fd,buffer,n);
+      status = write(output_fd,buffer,n);
       }
       while(n>0);
 

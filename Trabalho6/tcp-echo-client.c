@@ -114,17 +114,16 @@ int openActiveTCPport(char *hostnamep, char *servicenamep) {
 
 int main() {
     int sd;
-    char tx_buffer[5000];
-    char rx_buffer[5000];
+    char tx_buffer[BUFFERSIZE + 5];
+    char rx_buffer[BUFFERSIZE + 5];
     int status;
     int n;
 
     char hostnamep[80];
     char servicenamep[80];
 
-   
-    strcpy(hostnamep,"localhost");
-    printf("HOSTNAME: %s\n",hostnamep);
+    strcpy(hostnamep, "localhost");
+    printf("HOSTNAME: %s\n", hostnamep);
     // scanf("%s", hostnamep);
 
     printf("SERVICENAME: ");
@@ -138,7 +137,7 @@ int main() {
 
     fgets(tx_buffer, 80, stdin);  // descarta lixo
     while (1) {
-        printf(">> ");
+        printf("\n\n>> ");
         fgets(tx_buffer, 80, stdin);
         tx_buffer[strlen(tx_buffer) - 1] = '\r';
         tx_buffer[strlen(tx_buffer) - 1] = '\n';
@@ -150,31 +149,31 @@ int main() {
             exit(1);
         }
 
-        do{
-            
+        printf(">>> Recebendo resposta... \n");
+        do {
             // fflush(stdout);
-            rx_buffer[0] = 0;
-            n = read(sd, rx_buffer, BUFFERSIZE+1);
+            rx_buffer[0] = '\0';
+            n = read(sd, rx_buffer, BUFFERSIZE);
             if (n < 0) {
                 printf("ERRO no envido de datagramas UDP \n");
                 exit(1);
             }
-
-            printf(">>> %s \n", rx_buffer);
-
+            if (rx_buffer[n - 1] == '\n') {
+                rx_buffer[n - 1] = '\0';
+            }
+            printf("%s", rx_buffer);
             // Verifica se END está no comeco
-            if ((strncmp("END:",rx_buffer,4) == 0))
-            {
-                printf("END esta no comeco\n");
+            if ((strncmp("END:", rx_buffer, 4) == 0)) {
+                // printf("\nEND esta no comeco\n\n");
                 break;
 
             }
             // Verifica se END está no final
-            else if ((strncmp("END:",rx_buffer+strlen(rx_buffer)-4,4)==0))
-            {
-                printf("END esta no final\n");
+            else if ((strncmp("END:", rx_buffer + strlen(rx_buffer) - 4, 4) ==
+                      0)) {
+                // printf("\nEND esta no final\n\n");
                 break;
             }
-            }while(1);
+        } while (1);
     }
 }

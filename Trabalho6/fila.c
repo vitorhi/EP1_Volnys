@@ -65,6 +65,16 @@ int RetirarFila(struct fila *F) {
     return (item);
 }
 
+int RetirarFilaSemRemover(struct fila *F) {
+    int item;
+    if (FilaVazia(F)) {
+        printf("ERRO: tentando retirar de fila vazia. \n");
+        exit(1);
+    }
+    item = F->buffer[F->inicio];
+    return (item);
+}
+
 void PrintaBuffer(struct fila *F) {
     int i;
     printf("\n");

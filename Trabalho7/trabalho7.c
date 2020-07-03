@@ -115,10 +115,11 @@ void consumidor(int id) {
                     if (status == -1) perror("Erro na chamada write");
 
                     // Transfere arquivo html
-                    transferfile(path_file,newsd);
+                    status=transferfile(path_file,newsd);
+                    if (status == -1) perror("Erro na chamada transferfile")
 
-                    // // Final da mensagem, enviar quebras de linha
-                    // status = write(newsd, "\r\n", strlen("\r\n"));   
+                    // Final da mensagem, enviar quebras de linha
+                    status = write(newsd, "\r\n", strlen("\r\n"));   
                 }
 
                 
@@ -127,7 +128,7 @@ void consumidor(int id) {
             
             
         }
-        status = close(newsd);
+        // status = close(newsd);
         printf("Thread de tratamento %d terminado \n", id);
         printf("Aguardando novas conexoes... \n");
         conectado = 1;

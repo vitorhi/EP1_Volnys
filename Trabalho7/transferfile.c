@@ -41,7 +41,6 @@ int transferfile(char *path,int output_fd)
    // TODO: Fazer caso de txt
    if (strcmp(path+strlen(path)-4,"html")==0)
    {
-   		printf("ola\n");
   		// Envia Headers adicionais
 		  sprintf(str,"Content-Length: %zd\r\nContent-Type: text/html; charset=utf-8\r\n\r\n",statp.st_size);
    }
@@ -55,8 +54,7 @@ int transferfile(char *path,int output_fd)
    		// Envia Headers adicionais
 		  sprintf(str,"Content-Length: %zd\r\nContent-Type: image/png\r\n\r\n",statp.st_size);
    }
-   
-   // sprintf(str,"Content-Length: %ld\r\n\r\n",statp.st_size+4);
+   printf("str header: %s\n",str );
    write(output_fd,str,strlen(str));
    
 

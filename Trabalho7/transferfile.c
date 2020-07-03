@@ -37,8 +37,26 @@ int transferfile(char *path,int output_fd)
       status = close(input_fd);
       return(-1);
       }
-    // Envia Headers adicionais
-   sprintf(str,"Content-Length: %ld\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n",statp.st_size+4);
+   printf("end of path:%s\n",path+strlen(path)-4 );
+   // TODO: Fazer caso de txt
+   if (strcmp(path+strlen(path)-4,"html")==0)
+   {
+   		printf("ola\n");
+  		// Envia Headers adicionais
+		  sprintf(str,"Content-Length: %zd\r\nContent-Type: text/html; charset=utf-8\r\n\r\n",statp.st_size);
+   }
+   else if ((strcmp(path+strlen(path)-4,"jpeg"))==0)
+   {
+   		// Envia Headers adicionais
+		  sprintf(str,"Content-Length: %zd\r\nContent-Type: image/jpeg\r\n\r\n",statp.st_size);
+   }
+   else if ((strcmp(path+strlen(path)-3,"png"))==0)
+   {
+   		// Envia Headers adicionais
+		  sprintf(str,"Content-Length: %zd\r\nContent-Type: image/png\r\n\r\n",statp.st_size);
+   }
+   
+   // sprintf(str,"Content-Length: %ld\r\n\r\n",statp.st_size+4);
    write(output_fd,str,strlen(str));
    
 

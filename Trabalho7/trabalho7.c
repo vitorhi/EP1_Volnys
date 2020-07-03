@@ -26,18 +26,11 @@ int sd;  // Socket descriptor
 int status;
 int myport;
 int n_conex; //numero limite de conexoes
+char dir_path[]="diretorio";
 
 struct sockaddr_in mylocal_addr;
 
 int transferfile(char *path, int output_fd);
-
-int SendEND(int newsd) {
-    status = write(newsd, "END:\0", strlen("END:\0") + 1);
-    if (status == -1)
-        perror("Erro na chamada write");
-    else
-        printf("END enviado\n");
-}
 
 void produtor(int id) {
     int newsd;
@@ -48,6 +41,7 @@ void produtor(int id) {
     while (1) {
         newsd = accept(sd, (struct sockaddr *)&clientaddr, (socklen_t *)&size);
         printf("\nRecebi uma conexao: sd = %d\n", newsd);
+        printf("A fila possui %d elementos\n",F.nitens );
 
         if (FilaCheia(&F)) {
             printf("\nNumero maximo de conexoes atingidas\n");
@@ -72,6 +66,7 @@ void consumidor(int id) {
     int conectado = 1;
     FILE *fp;
     printf("Inicio Thread de tratamento %d \n", id);
+    char path_file[PATHSIZE];
 
     while(1){
         // Pega o item da fila, mas não retira
@@ -85,23 +80,49 @@ void consumidor(int id) {
 
             // Recebendo dados de newsd
             char rxbuffer[80];
+        
             status = read(newsd, rxbuffer, sizeof(rxbuffer));
             if (status == -1) perror("Erro na chamada read");
 
-            
-            
-            printf("Recebido (de sd = %d):\n\n  %s",newsd,rxbuffer);
-            if (strncmp(rxbuffer,"GET",3))
-            {
-                // Envia header com mensagem OK
-                status = write(newsd, "HTTP/1.0 200 OK\r\nServer: WEB\r\n", strlen("HTTP/1.0 200 OK\r\nServer: WEB\r\n"));
-                if (status == -1) perror("Erro na chamada write");
+            // Separa a string nos caracteres "espaco"
+            char *ptr = strtok(rxbuffer," ");
 
-                // Transfere arquivo html
-                transferfile("diretorio/index.html",newsd);
+            printf("\n\nRecebido (de sd = %d):\n\n  %s",newsd,ptr);
+            if (strcmp(ptr,"GET")==0)
+            {   
+                ptr = strtok(NULL, " ");
+                printf("\nptr: %s\n",ptr );
+                if(ptr!=NULL)
+                {
+                    // Copia diretorio para path_file
+                    strcpy(path_file, dir_path);
+                    printf("path_file: %s\n",path_file );
+                   
+                    // Concatena com o caminho do arquivo
+                    if(strcmp(ptr,"/")==0)
+                    {
+                        strcat(path_file,"/index.html");
+                    }
+                    else 
+                    {
+                        strcat(path_file,ptr);
+                    }
+                   
+                    printf("path_file_2: %s\n",path_file );
 
-                // Final da mensagem, enviar quebras de linha
-                status = write(newsd, "\r\n\r\n", strlen("\r\n\r\n"));   
+                    // Envia header com mensagem OK
+                    status = write(newsd, "HTTP/1.0 200 OK\r\nServer: WEB\r\n", strlen("HTTP/1.0 200 OK\r\nServer: WEB\r\n"));
+                    if (status == -1) perror("Erro na chamada write");
+
+                    // Transfere arquivo html
+                    transferfile(path_file,newsd);
+
+                    // // Final da mensagem, enviar quebras de linha
+                    // status = write(newsd, "\r\n", strlen("\r\n"));   
+                }
+
+                
+                conectado=0;
             }
             
             

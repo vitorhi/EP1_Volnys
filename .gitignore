@@ -2,5 +2,10 @@
 !*.c
 !*.h
 !Makefile
+!*.html
+!*.txt
+!*.jpg
+!*.png
+!*.gif
 !*/
 **/teste/

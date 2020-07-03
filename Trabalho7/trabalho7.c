@@ -116,7 +116,7 @@ void consumidor(int id) {
                         //Procura index.html na lista
                         if(strstr(listbuffer, "index.html") != NULL) {//Achou index.html na lista
                             printf("Entrei aqui\n");
-                            strcat(path_file,"/index.html");
+                            strcat(path_file,"index.html");
                         }else{
                             //TODO: CRIAR ARQUIVO HTML com hyperlinks para os arquivos
                             printf("Nao encontrei o arquivo 'index.html\n\n");

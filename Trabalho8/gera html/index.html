@@ -23,38 +23,40 @@
         </tr>
         <tr>
             <td>
-                <form action="selec_modo" method="GET">
+                
                     <table style="width:100%">
+			<form action="selec_modo" method="GET">
                         <tr>
                             <td>
                                 Modo de operação:
                             </td>
                             <td>
-                                <select id="modo" name="modo">
-                                    <option value="MANUAL">MANUAL</option>
-                                    <option value="AUTO">AUTOMATICO</option>
-                                </select><br>
+                          	Manual
+				<button name="selec_modo" type="submit" value="Mudar para Manual">Mudar para Auto</button>
                             </td>
-                        </tr>
+                        </tr> 
+			</form>
+			<form action="parametros" method="GET">
                         <tr>
                             <td>
                                 Intensidade do LED:
                             </td>
                             <td>
-                                <input type="text" name="intensidade" value="50"><br>
+                                <input type="text" name="Intensidade" value="50"> <input type="submit" value="Submit">
                             </td>
                         </tr>
                         <tr>
+			</form>
                             <td>
                                 Luminosidade:
                             </td>
                             <td>
-                                <input type="text" name="luminosidade" value="50"><br>
+                                50
                             </td>
                         </tr>
                     </table>
-                    <br><input type="submit" value="Submit">
-                </form>
+                    <br>
+                
             </td>
             <td>
                 <center><img src="img/lampada2.png" alt="Logo Poli" width="250pxpx" height="auto"

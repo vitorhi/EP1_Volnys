@@ -85,6 +85,7 @@ void consumidor(int id) {
     printf("Tratando conexao...\n\n");
     while (conectado == 1) {
       aguardar = FALSE;
+      int modo = MANUAL;
 
       // Recebendo dados de newsd
       char rxbuffer[80];
@@ -115,14 +116,29 @@ void consumidor(int id) {
           
           // Salva a intensidade
           if (ptr_lum!= NULL){
-            intensidade=atoi(ptr_lum);
-            strcpy(ptr,"/");
-            HTML_CUSTOMIZADO=1;
-
+            printf("entrei no if\n");
+            if(strcmp(ptr_lum, "AUTOMATICO") == 0) {
+                printf("Entrei aqui no if automatico: \n");
+                modo = AUTOMATICO;
+                strcpy(ptr,"/");
+                HTML_CUSTOMIZADO=1;
+            } else if(strcmp(ptr_lum, "MANUAL") == 0) {
+                modo = MANUAL;
+                strcpy(ptr,"/");
+                HTML_CUSTOMIZADO=1;
+            } else {
+                //printf("Entrei aqui:\n");
+                intensidade=atoi(ptr_lum);
+                strcpy(ptr,"/");
+                HTML_CUSTOMIZADO=1;
+                //printf("Intensidade: %d\n", intensidade);
+            }
+            printf("MODO: %d\n", modo);
           }
 
-          // printf("dir_file: %s\n", dir_path);
-          // printf("path_file: %s\n", path_file);
+          printf("dir_path: %s\n", dir_path);
+          printf("path_file: %s\n", path_file);
+          strcpy(path_file, dir_path);
 
           // Concatena com o caminho do arquivo
           if ((ptr[strlen(ptr) - 1] == '/')|| (HTML_CUSTOMIZADO==1 )){
@@ -136,8 +152,8 @@ void consumidor(int id) {
             char html[10000];
             int luminosidade;
             
-            int modo = MANUAL;
             luminosidade = valorsensor();
+            //printf(" %s: \n", dir_path);
             gera_html(html, dir_path, modo, intensidade, luminosidade);
 
             strcpy(listdir, strcat(path_file, ptr));

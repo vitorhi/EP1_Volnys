@@ -7,8 +7,12 @@
 void cria_arquivo(char buffer[], char dir_path[]) {
   FILE *fp;
   char caminho[200];
+  dir_path = "diretorio";
   strcpy(caminho, dir_path);
-  fp = fopen(strcat(caminho, "/index.html"), "w");
+  printf("Caminho: %s\n", caminho);
+  strcat(caminho, "/index.html");
+  printf("Caminho: %s\n", caminho);
+  fp = fopen(caminho, "w");
   int i;
   for (i = 0; buffer[i] != '\n'; i++) {
     /* write to file using fputc() function */
@@ -21,6 +25,7 @@ void gera_html(char html[10000], char dir_path[], int modo, int intensidade,
                int luminosidade) {
   int n;
   if (modo == AUTOMATICO) {
+      printf("Entrei no ger automatico\n");
     intensidade = 100 - luminosidade;
     n = sprintf(html, "<!DOCTYPE html>\
     \
@@ -88,6 +93,7 @@ void gera_html(char html[10000], char dir_path[], int modo, int intensidade,
     </html>\n",
                 REFRESHTIME, intensidade, luminosidade,
                 (200 - intensidade) / 2);
+    cria_arquivo(html, dir_path);
   } else if (modo == MANUAL) {
     n = sprintf(html, "<!DOCTYPE html>\
     \
@@ -155,6 +161,6 @@ void gera_html(char html[10000], char dir_path[], int modo, int intensidade,
     </body>\
     </html>\n", intensidade, luminosidade,
                 (200 - intensidade) / 2);
+    cria_arquivo(html, dir_path);
   }
-  cria_arquivo(html, dir_path);
 }

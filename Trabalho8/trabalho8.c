@@ -74,6 +74,8 @@ void consumidor(int id) {
   FILE *fp;
   printf("Inicio Thread de tratamento %d \n", id);
   char path_file[PATHSIZE];
+  int intensidade = 50;
+  int HTML_CUSTOMIZADO=0;
 
   while (1) {
     newsd = RetirarFila(&F);
@@ -102,6 +104,21 @@ void consumidor(int id) {
           // Copia diretorio para path_file
           path_file[0] = '\0';
           strcpy(path_file, dir_path);
+
+          // Cria buffer com o caminho
+          char buffer_lum[30];
+          strcpy(buffer_lum,ptr);
+          // Separa a string nos caracteres "=" e pega a intensidade          
+          char *ptr_lum= strtok(buffer_lum, "=");
+          ptr_lum = strtok(NULL, "=");
+          printf("\nptr_lum:%s\n", ptr_lum);
+          
+          // Salva a intensidade
+          if (ptr_lum!= NULL){
+            intensidade=atoi(ptr_lum);
+            HTML_CUSTOMIZADO=1;
+          }
+
           // printf("dir_file: %s\n", dir_path);
           // printf("path_file: %s\n", path_file);
 
@@ -115,8 +132,8 @@ void consumidor(int id) {
 
             // Criacao do HTML
             char html[10000];
-            int intensidade, luminosidade;
-            intensidade = 50;
+            int luminosidade;
+            
             int modo = MANUAL;
             luminosidade = valorsensor();
             gera_html(html, dir_path, modo, intensidade, luminosidade);
@@ -150,6 +167,8 @@ void consumidor(int id) {
           if (status == -1)
             perror("Erro na chamada transferfile");
 
+          // Retornar ao html normal
+          HTML_CUSTOMIZADO=0;
           // Final da mensagem, enviar quebras de linha
           status = write(newsd, "\r\n", strlen("\r\n"));
         } else {

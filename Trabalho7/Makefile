@@ -7,4 +7,4 @@ trabalho7:
 	cc trabalho7.c transferfile.c fila.c -o servidor -lpthread
 
 clean:
-	rm -rf *.o *~ printy
+	rm -rf *.o *~ servidor

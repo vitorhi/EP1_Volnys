@@ -20,13 +20,17 @@
 #define LINESIZE 80
 #define PATHSIZE 80
 
+// Declara numero da porta e nome da pasta diretorio
+int PORTA=8080;
+char BASE[]="diretorio";
+
 struct fila F;
 
 int sd;  // Socket descriptor
 int status;
-int myport;
+
 int n_conex; //numero limite de conexoes
-char dir_path[]="diretorio";
+
 
 struct sockaddr_in mylocal_addr;
 
@@ -90,12 +94,15 @@ void consumidor(int id) {
             printf("\n\nRecebido (de sd = %d):\n\n  %s",newsd,ptr);
             if (strcmp(ptr,"GET")==0)
             {   
+                // Separa o caminho do arquivo do resto do header
+                // e coloca em ptr
                 ptr = strtok(NULL, " ");
                 printf("\nptr: %s\n",ptr );
+
                 if(ptr!=NULL)
                 {
                     // Copia diretorio para path_file
-                    strcpy(path_file, dir_path);
+                    strcpy(path_file, BASE);
                     printf("path_file: %s\n",path_file );
                    
                     // Concatena com o caminho do arquivo
@@ -116,7 +123,7 @@ void consumidor(int id) {
 
                     // Transfere arquivo html
                     status=transferfile(path_file,newsd);
-                    if (status == -1) perror("Erro na chamada transferfile")
+                    if (status == -1) perror("Erro na chamada transferfile");
 
                     // Final da mensagem, enviar quebras de linha
                     status = write(newsd, "\r\n", strlen("\r\n"));   
@@ -142,13 +149,13 @@ int main() {
     if (sd == -1) {
         perror("Erro na chamada socket");
     }
-    myport=8080;
     
-    printf("Porta de escuta: %d\n",myport);
+    
+    printf("Porta de escuta: %d\n",PORTA);
 
     mylocal_addr.sin_family = AF_INET;
     mylocal_addr.sin_addr.s_addr = INADDR_ANY;
-    mylocal_addr.sin_port = htons(myport);
+    mylocal_addr.sin_port = htons(PORTA);
 
     status =
         bind(sd, (struct sockaddr *)&mylocal_addr, sizeof(struct sockaddr_in));

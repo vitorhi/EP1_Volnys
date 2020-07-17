@@ -116,14 +116,16 @@ void consumidor(int id) {
           // Salva a intensidade
           if (ptr_lum!= NULL){
             intensidade=atoi(ptr_lum);
+            strcpy(ptr,"/");
             HTML_CUSTOMIZADO=1;
+
           }
 
           // printf("dir_file: %s\n", dir_path);
           // printf("path_file: %s\n", path_file);
 
           // Concatena com o caminho do arquivo
-          if (ptr[strlen(ptr) - 1] == '/') {
+          if ((ptr[strlen(ptr) - 1] == '/')|| (HTML_CUSTOMIZADO==1 )){
             char line[LINESIZE];
             char path[PATHSIZE];
             char string[LINESIZE];
@@ -169,6 +171,7 @@ void consumidor(int id) {
 
           // Retornar ao html normal
           HTML_CUSTOMIZADO=0;
+
           // Final da mensagem, enviar quebras de linha
           status = write(newsd, "\r\n", strlen("\r\n"));
         } else {

@@ -42,9 +42,9 @@ int transferfile(char *path,int output_fd)
    if (strcmp(path+strlen(path)-4,"html")==0 || strcmp(path+strlen(path)-3,"txt")==0)
    {
   		// Envia Headers adicionais
-		  sprintf(str,"Content-Length: %zd\r\nContent-Type: text/html; charset=iso-8859-1\r\n\r\n",statp.st_size);
+		  sprintf(str,"Content-Length: %zd\r\nContent-Type: text/html; charset=utf-8\r\n\r\n",statp.st_size);
    }
-   else if ((strcmp(path+strlen(path)-3,"jpg"))==0)
+   else if ((strcmp(path+strlen(path)-4,"jpeg"))==0)
    {
    		// Envia Headers adicionais
 		  sprintf(str,"Content-Length: %zd\r\nContent-Type: image/jpeg\r\n\r\n",statp.st_size);
@@ -54,7 +54,9 @@ int transferfile(char *path,int output_fd)
    		// Envia Headers adicionais
 		  sprintf(str,"Content-Length: %zd\r\nContent-Type: image/png\r\n\r\n",statp.st_size);
    }
-    write(output_fd,str,strlen(str));
+
+   printf("str header: %s\n",str );
+   write(output_fd,str,strlen(str));
    
 
    // le arquivo , por partes 

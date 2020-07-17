@@ -1,5 +1,5 @@
 // Servidor TCP multi-conexoes - Trabalho7
-// Para compilar: cc -o trabalho6 trabalho6.c fila.c -lpthread transferfile.c
+// Para compilar: cc -o trabalho6 trabalho6.c fila.c listdir2.h -lpthread transferfile.c 
 
 #include <netdb.h>    //connect()
 #include <pthread.h>  //Biblioteca para multi-thread
@@ -11,6 +11,7 @@
 // #include <fcntl.h>
 
 #include "fila.h"
+#include "listdir2.h"
 
 #define QLEN 100  // Quantidade limite de conexoes pendentes
 #define TRUE 1
@@ -64,6 +65,8 @@ void produtor(int id) {
     }
 }
 
+
+
 void consumidor(int id) {
     int newsd = 0;
     int aguardar;
@@ -106,9 +109,27 @@ void consumidor(int id) {
                     printf("path_file: %s\n",path_file );
                    
                     // Concatena com o caminho do arquivo
-                    if(strcmp(ptr,"/")==0)
+                    if(ptr[strlen(ptr) -1]== '/')
                     {
-                        strcat(path_file,"/index.html");
+                        char line[LINESIZE];
+                        char path[PATHSIZE];
+                        char string[LINESIZE];
+                        char listbuffer[LISTBUFFERSIZE];
+                        char listdir[PATHSIZE];
+
+                        strcpy(listdir,strcat(path_file, ptr));
+                        lista_diretorio(listdir,listbuffer,LISTBUFFERSIZE);
+
+                        //Procura index.html na lista
+                        if(strstr(listbuffer, "index.html") != NULL) {//Achou index.html na lista
+                            printf("Entrei aqui\n");
+                            strcat(path_file,"index.html");
+                        }else{
+                            //TODO: CRIAR ARQUIVO HTML com hyperlinks para os arquivos
+                            printf("Nao encontrei o arquivo 'index.html\n\n");
+                            printf("Criando arquivo...");
+
+                        }
                     }
                     else 
                     {
@@ -127,6 +148,10 @@ void consumidor(int id) {
 
                     // Final da mensagem, enviar quebras de linha
                     status = write(newsd, "\r\n", strlen("\r\n"));   
+                }
+                else{
+                    status = write(newsd, "HTTP/1.0 505 HTTP Version Not Supported\r\nServer: WEB\r\n", strlen("HTTP/1.0 505 HTTP Version Not Supported\r\nServer: WEB\r\n"));
+                    if (status == -1) perror("Erro na chamada write");
                 }
 
                 
